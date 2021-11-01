@@ -58,7 +58,7 @@ async function run() {
 
          //DELETE API 
 
-         app.delete('/sevices/:id', async(req,res) => {
+         app.post('/services-delete/:id', async(req,res) => {
              const id = req.params.id;
              console.log('hello',id);
              const query = {_id:ObjectId(id)};
