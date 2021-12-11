@@ -24,22 +24,23 @@ async function run() {
         await client.connect();
         const database = client.db('tourism');
         const servicesCollection = database.collection('services');
+        const ordersCollection = database.collection('order');
 
         //Get API
 
-        app.get('/services',async(req,res)=>{
+        app.get('/services', async (req, res) => {
             const cursor = servicesCollection.find({});
             const services = await cursor.toArray();
             res.send(services);
 
         });
 
-         //Get API single service to booking
+        //Get API single service to booking
 
-        app.get('/services/:id',async(req,res)=>{
+        app.get('/services/:id', async (req, res) => {
             const id = req.params.id;
-            console.log('getting booking service',id);
-            const query = {_id:ObjectId(id)};
+            console.log('getting booking service', id);
+            const query = { _id: ObjectId(id) };
             const services = await servicesCollection.findOne(query);
             res.send(services);
 
@@ -55,17 +56,46 @@ async function run() {
             res.send(result);
         });
 
+        //add order item
 
-         //DELETE API 
+        app.post("/addorder", async (req, res) => {
+            const result = await ordersCollection.insertOne(req.body);
+            console.log(result);
+            res.send(result);
+        });
 
-         app.post('/services-delete/:id', async(req,res) => {
-             const id = req.params.id;
-             console.log('hello',id);
-             const query = {_id:ObjectId(id)};
-             const result = await servicesCollection.deleteOne(query);
-             res.json(result);
-             console.log('hello');
-         });
+        // get my orders list
+
+        app.get("/myOrders/:email", async (req, res) => {
+            //console.log(req.params.email);
+            const result = await ordersCollection.find({ email: req.params.email }).toArray();
+            res.send(result);
+        });
+
+
+
+        //DELETE Orders
+
+        app.post('/orders-delete/:id', async (req, res) => {
+            const id = req.params.id;
+            //console.log('hello', id);
+            const query = { _id: ObjectId(id) };
+            const result = await ordersCollection.deleteOne(query);
+            res.json(result);
+            //console.log('hello');
+        });
+
+
+        //DELETE API 
+
+        app.post('/services-delete/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log('hello', id);
+            const query = { _id: ObjectId(id) };
+            const result = await servicesCollection.deleteOne(query);
+            res.json(result);
+            console.log('hello');
+        });
     }
     finally {
         //await client.close();
